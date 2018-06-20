@@ -73,7 +73,7 @@ public class WindowController extends JFrame implements ActionListener {
           String driver = "com.mysql.cj.jdbc.Driver";
           String url = "jdbc:mysql://localhost:3306/gradecalc?useSSL=false";
           String user = "root";
-          String password = "jeep1221ALEX0119";
+          String password = "FuckMySQL";
           String nameCourse;
           Double weightCourse;
           try {
