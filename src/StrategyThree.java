@@ -9,7 +9,7 @@ import java.util.TreeMap;
 public class StrategyThree implements ComputeGPAStrategy {
     public double computeGPA(TreeMap<String, Double> score, TreeMap<String, Double> course){
 
-        //TODO: 仅计算已出学分绩点
+        //仅计算已出学分绩点 * 1.1
 
         double gpa = 0.0;
         double credit = 0;
@@ -23,7 +23,7 @@ public class StrategyThree implements ComputeGPAStrategy {
 
             if(Double.valueOf(v)!= -1.0){
                 gpa += Double.valueOf(v) * Double.valueOf(course.get(k));
-                credit += Double.valueOf(v);
+                credit += Double.valueOf(course.get(k));
             }
 
         }

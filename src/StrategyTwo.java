@@ -21,11 +21,11 @@ public class StrategyTwo implements ComputeGPAStrategy {
             String k = (String)entry.getKey();
             Double v = (Double)entry.getValue();
 
-            if(Double.valueOf(v)!= -1.0){
+            if(Double.valueOf(v) == -1){
                 v = 0.0;
-                gpa += Double.valueOf(v) * Double.valueOf(course.get(k));
-                credit += Double.valueOf(v);
             }
+                gpa += Double.valueOf(v) * Double.valueOf(course.get(k));
+                credit += Double.valueOf(course.get(k));
 
         }
 

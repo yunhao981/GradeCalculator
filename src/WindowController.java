@@ -5,6 +5,12 @@ import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.TreeMap;
 
 /**
  * Created by yunhao981 on 2018/6/19.
@@ -14,11 +20,17 @@ public class WindowController extends JFrame implements ActionListener {
     private JTextArea showArea;
     private JTextField textID;
     private JButton buttonSA, buttonSB, buttonSC, buttonSD;
+    private Context con;
+    private Student stu;
+    private TreeMap<String, Double> s;
+    private TreeMap<String, Double> c;
+
    WindowController(){
       init();
       setVisible(true);
       setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
    }
+
    private void init(){
       showArea = new JTextArea();
       textID = new JTextField(5);
@@ -45,22 +57,101 @@ public class WindowController extends JFrame implements ActionListener {
       add(pCenter, BorderLayout.CENTER);
       add(new JScrollPane(showArea), BorderLayout.SOUTH);
 
+
    }
 
    public void actionPerformed(ActionEvent e) {
       try{
-//         double a = Double.parseDouble(textA.getText().trim());
+          con = new Context();
+          stu = new Student();
+          s = new TreeMap<>();
+          c = new TreeMap<>();
           int id = Integer.parseInt(textID.getText().trim());
-            showArea.append(String.valueOf(id)+"\n");
-            if(e.getSource() == buttonSA){
-                showArea.append(String.valueOf(id)+"1\n");
+          stu.setId(id);
 
+          //连数据库
+          String driver = "com.mysql.cj.jdbc.Driver";
+          String url = "jdbc:mysql://localhost:3306/gradecalc?useSSL=false";
+          String user = "root";
+          String password = "jeep1221ALEX0119";
+          String nameCourse;
+          Double weightCourse;
+          try {
+              Connection connect;
+              Class.forName(driver).newInstance();
+              connect = DriverManager.getConnection(url, user, password);
+              System.out.println("Connection Established");
+              Statement statement = connect.createStatement();
+
+              String sqlCourse = "SELECT * FROM Course";
+              ResultSet rsCourse = statement.executeQuery(sqlCourse);
+              while(rsCourse.next()){
+                  nameCourse = rsCourse.getString("name");
+                  weightCourse = rsCourse.getDouble("weight");
+                  c.put(nameCourse, weightCourse);
+              }
+
+              String sqlStudent = "SELECT * FROM Student";
+              ResultSet rsStudent = statement.executeQuery(sqlStudent);
+              while(rsStudent.next()){
+                  Integer idStu = rsStudent.getInt("idStudent");
+                  String nameStu = rsStudent.getString("name");
+                  if(idStu == stu.getId()) {
+                      stu.setName(nameStu);
+//                      System.out.println(nameStu);
+                      break;
+                  }
+              }
+
+              String sql = "SELECT Student.idStudent, Student.name, Course.name, Stu_Cou.gpa FROM Student, Stu_Cou, Course WHERE Student.idStudent = Stu_Cou.idStu AND Stu_Cou.idCou = Course.idCourse";
+              ResultSet rs = statement.executeQuery(sql);
+              while(rs.next()){
+                  Integer idStu = rs.getInt("idStudent");
+                  String nameCou = rs.getString("Course.name");
+                  Double gpa = rs.getDouble("Stu_Cou.gpa");
+
+                  if(idStu == stu.getId()){
+                      s.put(nameCou, gpa);
+                  }
+              }
+              rsCourse.close();
+              connect.close();
+          } catch (Exception dbe) {
+//              System.out.print("MYSQL ERROR:" + dbe.getMessage());
+              dbe.printStackTrace();
+          }
+
+          // 根据id 从 Stu_Cou 里找到对应 idStu 的学生选的课 idCou 和 gpa
+          // 找到一个放一个进 s 里。
+
+            //根据上一个结果里的 idCourse 找到每个 idCou 对应的 weight
+            // 找到一个放一个进 c 里。
+
+          //s <课程名, 绩点>
+          //c <课程名, 学分>
+
+          stu.setCourse(c);
+          stu.setScore(s);
+
+          showArea.append("学号: " + stu.getId() + "\n");
+          showArea.append("姓名: " + stu.getName() + "\n");
+
+            if(e.getSource() == buttonSA){
+                con.setStrategy(new StrategyOne());
+                stu.setGpa(con.getStudentScore(stu.getScore(), stu.getCourse()));
+                showArea.append("总绩点: " + String.valueOf(stu.getGpa())+"\n");
             }else if(e.getSource() == buttonSB){
-                showArea.append(String.valueOf(id)+"2\n");
+                con.setStrategy(new StrategyTwo());
+                stu.setGpa(con.getStudentScore(stu.getScore(), stu.getCourse()));
+                showArea.append("总绩点: " + String.valueOf(stu.getGpa())+"\n");
             }else if(e.getSource() == buttonSC){
-                showArea.append(String.valueOf(id)+"3\n");
+                con.setStrategy(new StrategyThree());
+                stu.setGpa(con.getStudentScore(stu.getScore(), stu.getCourse()));
+                showArea.append("总绩点: " + String.valueOf(stu.getGpa())+"\n");
             }else if(e.getSource() == buttonSD){
-                showArea.append(String.valueOf(id)+"4\n");
+                con.setStrategy(new StrategyFour());
+                stu.setGpa(con.getStudentScore(stu.getScore(), stu.getCourse()));
+                showArea.append("总绩点: " + String.valueOf(stu.getGpa())+"\n");
             }
 
       }catch (Exception ex){

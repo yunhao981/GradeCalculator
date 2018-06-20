@@ -22,9 +22,9 @@ public class StrategyOne implements ComputeGPAStrategy {
            String k = (String)entry.getKey();
            Double v = (Double)entry.getValue();
 
-           if(Double.valueOf(v)!= -1.0){
+           if(Double.valueOf(v)!= -1){
                gpa += Double.valueOf(v) * Double.valueOf(course.get(k));
-               credit += Double.valueOf(v);
+               credit += Double.valueOf(course.get(k));
            }
        }
 

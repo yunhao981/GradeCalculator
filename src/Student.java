@@ -6,15 +6,15 @@ import java.util.TreeMap;
  */
 public class Student {
     private String name;
-    private double id;
-    double gpa;
+    private int id;
+    private double gpa;
     private TreeMap<String, Double> score;
     private TreeMap<String, Double> course;
 
     public void setName(String name) {
         this.name = name;
     }
-    public void setId(double id){
+    public void setId(int id){
         this.id = id;
     }
     public void setGpa(double gpa){
@@ -30,7 +30,7 @@ public class Student {
     public String getName(){
         return name;
     }
-    public double getId(){
+    public int getId(){
         return id;
     }
     public TreeMap<String, Double> getScore(){
